@@ -4,486 +4,483 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plano de Negócios - Lava-Jato Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;700;800&family=Azeret+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
-        /* RESET & CONFIGURAÇÕES GERAIS */
+        /* ===========================================
+           ARQUITETURA DE DESIGN: MOBILE FIRST + SLIDES
+           ===========================================
+        */
+
+        :root {
+            --bg-color: #050505;
+            --accent-color: #deff9a;
+            --text-main: #f5f5f5;
+            --text-dim: #adadad;
+            --card-bg: #0d0d0d;
+            --border-color: rgba(222, 255, 154, 0.2);
+            --slide-padding: 2rem 1.5rem;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
+
+        html {
+            /* Ativa o efeito de transição suave nativa entre slides */
+            scroll-behavior: smooth;
+        }
+
         body {
-            background-color: #030303;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background-color: var(--bg-color);
+            font-family: 'Urbanist', sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* SISTEMA DE APRESENTAÇÃO */
-        .slide-container {
-            display: none;
-            width: 100vw;
-            height: 100vh;
-            background-color: #050505;
-            position: relative;
-            overflow: hidden;
+        /* O CONTAINER DA APRESENTAÇÃO VIRA UM FRAME DE SCROLL SNAP
+           Isso cria o comportamento de passar slide por slide.
+        */
+        .presentation {
+            display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 60px 100px;
-            user-select: none;
+            width: 100%;
+            height: 100svh; /* svh garante tela cheia real no iOS/Android */
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory; /* Força o alinhamento magnético do slide */
+            scroll-behavior: smooth;
         }
 
-        .slide-container.active {
+        /* CONTAINER DOS SLIDES (MOBILE FIRST) */
+        .slide-container {
+            flex-shrink: 0;
+            width: 100%;
+            height: 100svh; /* Garante que cada slide ocupe a tela inteira */
+            background-color: var(--bg-color);
+            position: relative;
             display: flex;
+            flex-direction: column;
+            padding: var(--slide-padding);
+            overflow-y: auto; /* Permite scroll interno seguro se a tela for minúscula */
+            scroll-snap-align: start; /* Ponto de ancoragem do slide */
+            scroll-snap-stop: always; /* Garante que passe de um em um */
+            transition: opacity 0.5s ease; /* Transição visual sutil */
         }
 
-        /* GLOW BACKGROUND EFFECT GRADIENT */
+        /* GRADIENTE DE FUNDO */
         .slide-container::before {
             content: '';
             position: absolute;
-            top: -150px;
-            right: -150px;
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(222, 255, 154, 0.12) 0%, rgba(141, 181, 49, 0.02) 50%, transparent 70%);
+            top: -10%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(222, 255, 154, 0.05) 0%, transparent 70%);
+            z-index: 0;
             pointer-events: none;
         }
 
-        .slide-container::after {
-            content: '';
-            position: absolute;
-            bottom: 40px;
-            left: 100px;
-            right: 100px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(222, 255, 154, 0.3), transparent);
+        .content-area {
+            position: relative;
+            z-index: 1;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .slide-container > * { position: relative; z-index: 10; }
-
-        /* NAVEGAÇÃO VELADA (ZONAS DE CLIQUE) */
-        .nav-zone {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 10%;
-            z-index: 100;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        .nav-left { left: 0; }
-        .nav-right { right: 0; }
-        .nav-zone:hover { background: linear-gradient(to right, rgba(222, 255, 154, 0.02), transparent); }
-        .nav-right:hover { background: linear-gradient(to left, rgba(222, 255, 154, 0.02), transparent); }
-
-        /* TIPOGRAFIA EXECUTIVA */
-        h1 { font-size: 5rem; line-height: 1.1; font-weight: 800; text-align: center; letter-spacing: -1.5px; }
-        h1 span { 
-            background: linear-gradient(135deg, #deff9a 0%, #a6df3e 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        /* TIPOGRAFIA MOBILE */
+        h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.1; letter-spacing: -1px; }
+        h1 span { color: var(--accent-color); }
         
-        .slide-title { 
-            font-size: 2.6rem; 
-            font-weight: 800; 
-            margin-bottom: 25px; 
-            border-left: 6px solid #deff9a; 
-            padding-left: 20px;
+        .slide-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            color: var(--text-main);
+            border-left: 6px solid var(--accent-color);
+            padding-left: 15px;
+            text-transform: uppercase;
+        }
+        .slide-title span { color: var(--accent-color); }
+
+        p, li { font-size: 0.95rem; line-height: 1.5; color: var(--text-dim); }
+        strong { color: var(--text-main); }
+
+        /* LAYOUTS MOBILE */
+        .title-layout { text-align: center; }
+        .section-title-layout { text-align: center; }
+        .section-title-layout h2 { font-size: 2.3rem; margin-bottom: 15px; color: var(--accent-color); }
+        .section-title-layout hr { border: none; height: 2px; background: var(--accent-color); width: 80px; margin: 0 auto 15px; }
+
+        .two-column { display: flex; flex-direction: column; gap: 1.5rem; width: 100%; }
+
+        /* IMAGENS RESPONSIVAS */
+        .image-wrapper { 
+            width: 100%; 
+            height: 200px; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* TILES (GRID) MOBILE */
+        .tiled-content { display: flex; flex-direction: column; gap: 12px; }
+        .tile { 
+            background: var(--card-bg); 
+            padding: 18px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .tile i { font-size: 1.8rem; color: var(--accent-color); margin-bottom: 8px; display: block; }
+        .tile h3 { font-size: 1.2rem; margin-bottom: 8px; color: var(--text-main); }
+
+        /* LISTAS */
+        .bullet-list { list-style: none; }
+        .bullet-list li { margin-bottom: 12px; padding-left: 25px; position: relative; }
+        .bullet-list li::before { content: '→'; position: absolute; left: 0; color: var(--accent-color); font-weight: bold; }
+
+        /* TABELA MOBILE WITH HORIZONTAL SCROLL */
+        .table-responsive { width: 100%; overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-color); }
+        table { width: 100%; min-width: 550px; border-collapse: collapse; background: var(--card-bg); }
+        th { background: #111; color: var(--accent-color); padding: 12px; text-align: left; font-size: 0.9rem; border-bottom: 1px solid var(--border-color); }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+
+        /* GRÁFICO SLIDE 8 - MOBILE COMPACTO E TOTALMENTE LEGÍVEL */
+        .chart-container { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+        .bar { display: flex; flex-direction: column; width: 100%; gap: 4px; }
+        .bar .label { font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
+        .bar .bar-inner { width: 100%; height: 35px; background: #111; border-radius: 6px; overflow: hidden; }
+        .bar .bar-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #86b32d, #deff9a); 
+            display: flex; 
+            align-items: center; 
+            padding-left: 15px; 
+            color: #ffffff; 
+            font-weight: 700; 
+            font-size: 0.85rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9); 
+            white-space: nowrap; 
+        }
+
+        /* DOUGHNUT E FORMULA MOBILE */
+        .doughnut-chart-container { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .doughnut-chart { 
+            width: 160px; height: 160px; border-radius: 50%; 
+            background: conic-gradient(var(--accent-color) 0% 65%, #86b32d 65% 85%, #333 85% 100%);
+            mask: radial-gradient(transparent 55%, black 56%);
+            -webkit-mask: radial-gradient(transparent 55%, black 56%);
+        }
+        .legend { list-style: none; width: 100%; }
+        .legend li { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 0.85rem; }
+        .color-box { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
+        
+        .formula-container { 
+            background: #111; padding: 12px; border-radius: 8px; 
+            border: 1px dashed var(--accent-color);
+            margin-top: 15px; font-family: 'Azeret Mono', monospace;
+            font-size: 0.85rem; color: var(--accent-color); text-align: center;
+        }
+
+        /* TIMELINE MOBILE (VERTICAL) */
+        .timeline-layout { display: flex; flex-direction: column; gap: 1.5rem; position: relative; padding-left: 20px; border-left: 2px solid #333; margin-left: 10px; }
+        .timeline-line { display: none; }
+        .timeline-item { position: relative; text-align: left; }
+        .timeline-item::before { 
+            content: ''; position: absolute; top: 5px; left: -29px; 
+            width: 14px; height: 14px; background: var(--accent-color); border-radius: 50%;
+        }
+        .timeline-item h3 { margin-bottom: 8px; color: var(--accent-color); font-size: 1.15rem; }
+
+        /* RODAPÉ EQUIPE (SEMPRE ALINHADO NA PARTE INFERIOR) */
+        .footer-equipe {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            text-align: center;
+            padding-top: 15px;
+            margin-top: auto;
+            border-top: 1px solid rgba(222, 255, 154, 0.1);
+            font-family: 'Azeret Mono', monospace;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        .slide-title span { 
-            background: linear-gradient(135deg, #deff9a 0%, #a6df3e 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+
+
+        /* ===========================================
+           MEDIA QUERIES: MODO APRESENTAÇÃO DESKTOP
+           ===========================================
+        */
+        @media (min-width: 1024px) {
+            /* Remove margens e scrollbars externas para virar tela cheia executiva */
+            body { overflow: hidden; height: 100vh; }
+            
+            .presentation { height: 100vh; }
+
+            .slide-container {
+                height: 100vh;
+                padding: 60px 100px;
+                overflow: hidden; /* Trava no PC para não ter barra de rolar interna */
+            }
+
+            .slide-container::before { width: 600px; height: 600px; }
+
+            /* Escala de Tipografia para PC */
+            h1 { font-size: 4.8rem; letter-spacing: -2px; }
+            .slide-title { font-size: 2.6rem; margin-bottom: 2rem; }
+            p, li { font-size: 1.2rem; }
+            .section-title-layout h2 { font-size: 4rem; }
+
+            /* Layouts PC */
+            .two-column { flex-direction: row; align-items: center; gap: 4rem; }
+            .image-wrapper { height: 380px; }
+            
+            .tiled-content { flex-direction: row; display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+            .tile { padding: 30px; }
+            
+            .table-responsive { overflow: visible; }
+            th, td { font-size: 1.05rem; padding: 18px; }
+
+            /* Gráfico Doughnut PC */
+            .doughnut-chart-container { flex-direction: row; justify-content: center; gap: 60px; }
+            .doughnut-chart { width: 280px; height: 280px; }
+            .legend li { font-size: 1.05rem; }
+            .formula-container { font-size: 1.15rem; display: inline-block; }
+
+            /* Gráfico de Barras Slide 8 PC */
+            .bar { flex-direction: row; align-items: center; gap: 0; }
+            .bar .label { width: 250px; text-align: right; padding-right: 20px; font-size: 1.05rem; }
+            .bar .bar-inner { flex-grow: 1; height: 48px; }
+            .bar .bar-fill { font-size: 1.05rem; padding-left: 20px; }
+
+            /* Timeline PC */
+            .timeline-layout { 
+                flex-direction: row; justify-content: space-between; border-left: none; padding-left: 0; margin-left: 0; 
+            }
+            .timeline-line { display: block; position: absolute; top: 40px; left: 0; width: 100%; height: 2px; background: #333; }
+            .timeline-item { width: 23%; text-align: center; }
+            .timeline-item::before { top: 32px; left: 50%; transform: translateX(-50%); width: 18px; height: 18px; }
+            .timeline-item h3 { margin-bottom: 50px; margin-top: 0; }
+
+            .footer-equipe { font-size: 0.8rem; padding-top: 25px; }
         }
-        
-        p, li { font-size: 1.4rem; color: #adadad; line-height: 1.6; margin-bottom: 12px; }
-        strong { color: #ffffff; font-weight: 600; }
-        
-        .subtitle { font-size: 1.8rem; color: #888; text-align: center; max-width: 950px; margin: 30px auto 0; line-height: 1.5; }
-
-        .content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; }
-
-        /* LAYOUTS */
-        .title-layout { text-align: center; margin: auto; max-width: 1100px; }
-        
-        .section-title-layout { text-align: center; margin: auto; }
-        .section-title-layout hr { border: none; height: 4px; background: linear-gradient(90deg, transparent, #deff9a, transparent); width: 200px; margin: 25px auto; }
-        .section-title-layout h2 { font-size: 4.8rem; font-weight: 800; color: #ffffff; letter-spacing: -1.5px; }
-
-        .two-column { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 60px; align-items: center; width: 100%; }
-        .two-column h3 { font-size: 2rem; color: #deff9a; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .image-wrapper { 
-            width: 100%; 
-            height: 420px; 
-            border-radius: 16px; 
-            overflow: hidden;
-            border: 1px solid #222; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-        .image-wrapper img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(10%) brightness(85%); }
-
-        .tiled-content { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 100%; }
-        .tile { background: #0d0d0d; padding: 40px 30px; border-radius: 16px; text-align: left; border: 1px solid #1a1a1a; transition: all 0.3s ease; }
-        .tile:hover { border-color: #deff9a; transform: translateY(-5px); }
-        .tile .tile-icon { font-size: 2.5rem; margin-bottom: 20px; color: #deff9a; display: block; }
-        .tile h3 { font-size: 1.6rem; margin-bottom: 15px; color: #ffffff; font-weight: 700; }
-        .tile p { font-size: 1.1rem; color: #888; margin-bottom: 0; }
-
-        .bullet-list { list-style: none; }
-        .bullet-list li { position: relative; padding-left: 35px; margin-bottom: 20px; font-size: 1.35rem; }
-        .bullet-list li::before { content: '→'; position: absolute; left: 0; color: #deff9a; font-size: 1.4rem; font-weight: bold; top: -1px; }
-
-        /* TABELAS EXECUTIVAS */
-        table { width: 100%; border-collapse: collapse; background: #0d0d0d; border-radius: 12px; overflow: hidden; border: 1px solid #1a1a1a; }
-        th { background: #111; color: #deff9a; padding: 20px; text-align: left; font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #222; }
-        td { padding: 20px; border-bottom: 1px solid #1a1a1a; font-size: 1.2rem; color: #adadad; }
-        tr:last-child td { border-bottom: none; }
-        tr:nth-child(even) { background: rgba(255, 255, 255, 0.01); }
-
-        /* REESTRUTURAÇÃO DO GRÁFICO DE CUSTOS COM ALTA VISIBILIDADE E GRADIENTE CHIC */
-        .chart-container { width: 100%; display: flex; flex-direction: column; gap: 24px; }
-        .bar { display: flex; align-items: center; width: 100%; }
-        .bar .label { 
-            width: 280px; 
-            text-align: right; 
-            padding-right: 25px; 
-            font-weight: 700; 
-            font-size: 1.35rem; 
-            color: #ffffff; 
-            flex-shrink: 0;
-            letter-spacing: 0.5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-        .bar .bar-inner { 
-            flex-grow: 1; 
-            height: 50px; 
-            background: #090909; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            border: 1px solid #262626;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
-        }
-        .bar .bar-fill { 
-            height: 100%; 
-            background: linear-gradient(90deg, #b3ea3a 0%, #deff9a 50%, #ffffff 100%); 
-            display: flex; 
-            align-items: center; 
-            padding-left: 24px; 
-            color: #000000; 
-            font-weight: 800; 
-            font-size: 1.2rem; 
-            white-space: nowrap;
-            letter-spacing: 0.2px;
-            box-shadow: 3px 0 10px rgba(222, 255, 154, 0.4);
-            text-shadow: 0 0 1px rgba(255,255,255,0.5);
-        }
-
-        /* PIZZA / DOUGHNUT */
-        .doughnut-chart-container { display: flex; align-items: center; justify-content: center; gap: 80px; }
-        .doughnut-chart { width: 280px; height: 280px; border-radius: 50%; border: 10px solid #0d0d0d; }
-        .legend { list-style: none; display: flex; flex-direction: column; gap: 20px; }
-        .legend li { display: flex; align-items: center; gap: 15px; font-size: 1.3rem; color: #ffffff; margin-bottom: 0; }
-        .color-box { width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0; }
-
-        /* ROADMAP CRONOLÓGICO */
-        .timeline-layout { display: flex; justify-content: space-between; position: relative; padding: 60px 0; align-items: flex-start; }
-        .timeline-line { position: absolute; top: 95px; left: 0; width: 100%; height: 2px; background: #222; z-index: 1; }
-        .timeline-item { width: 22%; position: relative; text-align: center; z-index: 5; }
-        .timeline-item::after { content: ''; position: absolute; top: 35px; left: 50%; transform: translate(-50%, -50%); width: 16px; height: 16px; background: #deff9a; border-radius: 50%; border: 4px solid #050505; box-shadow: 0 0 15px rgba(222, 255, 154, 0.6); }
-        .timeline-item h3 { color: #deff9a; margin-bottom: 60px; font-size: 1.4rem; font-weight: 700; text-transform: uppercase; }
-        .timeline-item p { font-size: 1.1rem; color: #888; padding: 0 10px; }
-
-        /* ENCERRAMENTO */
-        .qa-layout { text-align: center; margin: auto; }
-        .qa-layout h2 { font-size: 5.5rem; color: #deff9a; margin-bottom: 20px; letter-spacing: -1px; }
-        .contact-info { margin-top: 40px; font-size: 1.4rem; border-top: 1px solid #1a1a1a; padding-top: 30px; display: inline-block; color: #888; }
-        .contact-info strong { color: #deff9a; }
-        
-        .formula-text { font-size: 1.4rem; color: #deff9a; font-family: 'Courier New', monospace; background: #0d0d0d; padding: 15px 30px; border-radius: 6px; border: 1px dashed #222; display: inline-block; margin-top: 25px; }
-
-        .controls-hint { position: absolute; bottom: 20px; right: 40px; font-size: 11px; color: #555; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-    <!-- Zonas de Navegação Invisíveis nas Laterais -->
-    <div class="nav-zone nav-left" id="prevBtn"></div>
-    <div class="nav-zone nav-right" id="nextBtn"></div>
-
-    <!-- SLIDE 1: CAPA -->
-    <div class="slide-container active" id="slide1">
-        <div></div>
-        <div class="title-layout">
-            <h1>Sistema de <span>Lava-Jato</span> Digital</h1>
-            <p class="subtitle">Business Model Canvas e Viabilidade Financeira para Plataforma Multilateral de Alta Escala.</p>
+<div class="presentation">
+    
+    <section class="slide-container" id="slide1">
+        <div class="content-area title-layout">
+            <h1>Sistema de<br><span>Lava-Jato Digital</span></h1>
+            <p style="font-size: 1.4rem; margin-top: 20px;">Plano de Negócios e Viabilidade Estratégica</p>
         </div>
-        <div class="controls-hint">Laterais da tela ou setas do teclado</div>
-    </div>
+        <div class="footer-equipe">Equipe: Rafael Romero, Bryan Lucas, Daniel Abner e Felipe Braga</div>
+    </section>
 
-    <!-- SLIDE 2: TRANSIÇÃO DE CONTEXTO -->
-    <div class="slide-container" id="slide2">
-        <div></div>
-        <div class="section-title-layout">
-            <h2>Contexto & Oportunidade</h2>
+    <section class="slide-container" id="slide2">
+        <div class="content-area section-title-layout">
             <hr>
-            <p>A disrupção digital de um mercado altamente fragmentado e sub-digitalizado.</p>
+            <h2>Contexto e Oportunidade</h2>
+            <p style="font-size: 1.25rem; max-width: 800px; margin: 0 auto;">Transformação digital de um mercado tradicional e fragmentado.</p>
         </div>
-        <div></div>
-    </div>
+        <div class="footer-equipe">Equipe: Rafael Romero, Bryan Lucas, Daniel Abner e Felipe Braga</div>
+    </section>
 
-    <!-- SLIDE 3: DIAGNÓSTICO -->
-    <div class="slide-container" id="slide3">
+    <section class="slide-container" id="slide3">
         <h2 class="slide-title">Gaps do <span>Mercado Atual</span></h2>
+        <div class="content-area">
+            <div class="two-column">
+                <ul class="bullet-list">
+                    <li><strong>Ociosidade Crônica:</strong> Falta de agendamento preditivo gera perda de receita diária.</li>
+                    <li><strong>Invisibilidade:</strong> 85% dos lava-jatos não possuem presença digital relevante na região.</li>
+                    <li><strong>Gestão Analógica:</strong> Controle de caixa em papel impede o entendimento do LTV (Ciclo de Vida do Cliente).</li>
+                    <li><strong>Atrito na Jornada:</strong> Consumidor moderno busca conveniência, facilidade de pagamento e tracking.</li>
+                </ul>
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?q=80&w=1280&auto=format&fit=crop" alt="Car Wash Moderno">
+                </div>
+            </div>
+        </div>
+        <div class="footer-equipe">Equipe: Rafael Romero, Bryan Lucas, Daniel Abner e Felipe Braga</div>
+    </section>
+
+    <section class="slide-container" id="slide4">
+        <h2 class="slide-title">Proposta de <span>Valor Multilateral</span></h2>
+        <div class="content-area">
+            <div class="tiled-content">
+                <div class="tile">
+                    <i class="fa-solid fa-shop"></i>
+                    <h3>Para o Lojista (B2B)</h3>
+                    <p>SaaS de gestão completa, inteligência de escala e canal direto de aquisição de clientes sem esforço pesado de marketing.</p>
+                </div>
+                <div class="tile">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <h3>Para o Usuário (B2C)</h3>
+                    <p>Agendamento em 3 cliques, transparência total de preços e sistema de avaliação real para garantir qualidade no serviço.</p>
+                </div>
+                <div class="tile">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <h3>O Diferencial</h3>
+                    <p>Algoritmo de precificação dinâmica baseado em demanda da agenda e geolocalização em tempo real do usuário.</p>
+                </div>
+            </div>
+        </div>
+        <div class="footer-equipe">Equipe: Rafael Romero, Bryan Lucas, Daniel Abner e Felipe Braga</div>
+    </section>
+
+    <section class="slide-container" id="slide5">
+        <h2 class="slide-title">Operação e <span>Engrenagens</span></h2>
         <div class="content-area">
             <div class="two-column">
                 <div>
                     <ul class="bullet-list">
-                        <li><strong>Ociosidade vs. Picos:</strong> A ausência de agendamento preditivo gera gargalos operacionais crônicos.</li>
-                        <li><strong>Invisibilidade Digital:</strong> Estabelecimentos tradicionais perdem share por falta de canais de descoberta online.</li>
-                        <li><strong>Vazamento de Receita:</strong> Gestão de caixa analógica impede a retenção e o entendimento do LTV do cliente.</li>
-                        <li><strong>Atrito na Jornada:</strong> O consumidor moderno exige conveniência, tracking em tempo real e checkout sem fricção.</li>
+                        <li><strong>Atividades Chave:</strong> Desenvolvimento Ágil da plataforma, Onboarding eficiente de Parceiros e Growth Marketing.</li>
+                        <li><strong>Recursos Principais:</strong> Infraestrutura Cloud Resiliente (AWS/GCP) e Base de Dados Proprietária.</li>
+                        <li><strong>Canais de Tração:</strong> Inside Sales atuando pesado no B2B e Social Ads hiper-geolocalizado para o público B2C.</li>
                     </ul>
                 </div>
                 <div class="image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=800&q=80" alt="Premium Car Wash Operational">
+                    <img src="https://images.unsplash.com/photo-1618761714954-0b8cd0026356?q=80&w=1280&auto=format&fit=crop" alt="App Mobile Dashboard">
                 </div>
             </div>
         </div>
-        <div></div>
-    </div>
+        <div class="footer-equipe">Equipe: Rafael Romero, Bryan Lucas, Daniel Abner e Felipe Braga</div>
+    </section>
 
-    <!-- SLIDE 4: TRANSIÇÃO CANVAS -->
-    <div class="slide-container" id="slide4">
-        <div></div>
-        <div class="section-title-layout">
-            <h2>Business Model Canvas</h2>
-            <hr>
-            <p>A arquitetura de valor desenhada para monetizar as duas pontas do ecossistema.</p>
-        </div>
-        <div></div>
-    </div>
-
-    <!-- SLIDE 5: VALUE PROP -->
-    <div class="slide-container" id="slide5">
-        <h2 class="slide-title">Segmentos & <span>Proposta de Valor</span></h2>
+    <section class="slide-container" id="slide6">
+        <h2 class="slide-title">Structure of <span>Receitas</span></h2>
         <div class="content-area">
-            <div class="two-column">
-                <div>
-                    <h3>Proposta Multilateral</h3>
-                    <p style="margin-bottom: 20px;"><strong>Value Prop B2B (Lava-Jatos):</strong> SaaS de ERP dedicado, otimização de insumos, inteligência de escala e canal direto de aquisição através do marketplace nativo.</p>
-                    <p style="margin-bottom: 25px;"><strong>Value Prop B2C (Motoristas):</strong> Agendamento geolocalizado em 3 cliques, transparência de pricing, motor de avaliação e carteira digital com cashback dinâmico.</p>
-                    <h3>ICP Foco</h3>
-                    <p>Centros de estética automotiva de médio a grande porte (SaaS) e motoristas urbanos de alta renda (App).</p>
-                </div>
-                <div class="image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=800&q=80" alt="Mobile Technology Integration">
-                </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Modelo de Negócio</th>
+                            <th>Mecanismo de Captura</th>
+                            <th>Público Alvo</th>
+                            <th>Impacto no Caixa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>SaaS (Recorrência)</strong></td>
+                            <td>Mensalidade fixa pelo uso do ERP.</td>
+                            <td>Estabelecimentos</td>
+                            <td>Previsibilidade (MRR elevado).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Take Rate</strong></td>
+                            <td>Comissão de 8% por transação no App.</td>
+                            <td>Marketplace (B2B2C)</td>
+                            <td>Escalabilidade e Volume.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Anúncios / Ads</strong></td>
+                            <td>Destaque pago na busca do App.</td>
+                            <td>Parceiros Premium</td>
+                            <td>Margem Líquida altíssima.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div></div>
-    </div>
+        <div class="footer-equipe">Equipe: Rafael Romero, Bryan Lucas, Daniel Abner e Felipe Braga</div>
+    </section>
 
-    <!-- SLIDE 6: ARQUITETURA DA OPERAÇÃO -->
-    <div class="slide-container" id="slide6">
-        <h2 class="slide-title">Operação & <span>Engrenagens</span> Chave</h2>
-        <div class="content-area">
-            <div class="tiled-content">
-                <div class="tile">
-                    <span class="tile-icon">⚙️</span>
-                    <h3>Atividades-Chave</h3>
-                    <p>Engenharia de software ágil, manutenção de infraestrutura cloud resiliente, UI/UX focada em conversão e suporte técnico enterprise.</p>
-                </div>
-                <div class="tile">
-                    <span class="tile-icon">📈</span>
-                    <h3>Canais de Tração</h3>
-                    <p>Estratégia de Growth marketing geolocalizado, inbound focado em parceiros B2B e parcerias estruturais com frotistas e seguradoras.</p>
-                </div>
-                <div class="tile">
-                    <span class="tile-icon">🔐</span>
-                    <h3>Parcerias Estratégicas</h3>
-                    <p>Gateways de pagamento (Core Banking split-payment), grandes distribuidores de insumos químicos e APIs de geolocalização.</p>
-                </div>
-            </div>
-        </div>
-        <div></div>
-    </div>
-
-    <!-- SLIDE 7: GO-TO-MARKET MONETIZAÇÃO -->
-    <div class="slide-container" id="slide7">
-        <h2 class="slide-title">Estrutura de <span>Receitas</span></h2>
-        <div class="content-area">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Modelo de Negócio</th>
-                        <th>Mecanismo de Captura</th>
-                        <th>Segmento Alvo</th>
-                        <th>Dinâmica Volumétrica</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>SaaS (Recorrência)</strong></td>
-                        <td>Mensalidade fixa pelo uso do ERP avançado de gestão interna.</td>
-                        <td>Estabelecimentos</td>
-                        <td>Garante previsibilidade e MRR base.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Take Rate (Transacional)</strong></td>
-                        <td>Comissão de 8% retida no split-payment de cada agendamento via App.</td>
-                        <td>Usuários Finais</td>
-                        <td>Escalabilidade geométrica do ecossistema.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Retail Media (Ads)</strong></td>
-                        <td>Taxa de posicionamento patrocinado no topo das buscas do Marketplace.</td>
-                        <td>Parceiros Premium</td>
-                        <td>Alta margem líquida direto para a última linha.</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div></div>
-    </div>
-
-    <!-- SLIDE 8: ALLOCATION OF CAPITAL (CORRIGIDO E APERFEIÇOADO) -->
-    <div class="slide-container" id="slide8">
-        <h2 class="slide-title">Estrutura de <span>Custos (CapEx/OpEx)</span></h2>
-        <div class="content-area" style="justify-content: center; display: flex; align-items: center;">
-            <div class="chart-container" style="width: 100%; max-width: 1100px;">
-                
-                <!-- Barra 1 -->
-                <div class="bar">
-                    <div class="label">P&D e Engenharia</div>
-                    <div class="bar-inner">
-                        <div class="bar-fill" style="width: 45%;">45% — Core Dev, Infra Cloud e APIs</div>
-                    </div>
-                </div>
-
-                <!-- Barra 2 -->
-                <div class="bar">
-                    <div class="label">Marketing e CAC</div>
-                    <div class="bar-inner">
-                        <div class="bar-fill" style="width: 30%;">30% — Atração B2B e App B2C</div>
-                    </div>
-                </div>
-
-                <!-- Barra 3 -->
-                <div class="bar">
-                    <div class="label">Operações e CS</div>
-                    <div class="bar-inner">
-                        <div class="bar-fill" style="width: 15%;">15% — Onboarding e Suporte</div>
-                    </div>
-                </div>
-
-                <!-- Barra 4 -->
-                <div class="bar">
-                    <div class="label">Admin, Legal e Ops</div>
-                    <div class="bar-inner">
-                        <div class="bar-fill" style="width: 10%;">10% — Compliance e Backoffice</div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-        <div></div>
-    </div>
-
-    <!-- SLIDE 9: UNIT ECONOMICS -->
-    <div class="slide-container" id="slide9">
-        <h2 class="slide-title">Unit Economics & <span>Eficiência</span></h2>
+    <section class="slide-container" id="slide7">
+        <h2 class="slide-title">Unit <span>Economics</span></h2>
         <div class="content-area">
             <div class="doughnut-chart-container">
-                <div class="doughnut-chart" style="background: conic-gradient(#deff9a 0% 65%, #a3cf4d 65% 85%, #1a1a1a 85% 100%);"></div>
+                <div class="doughnut-chart"></div>
                 <ul class="legend">
-                    <li><div class="color-box" style="background: #deff9a;"></div>Margem de Contribuição Alvo (65%)</li>
-                    <li><div class="color-box" style="background: #a3cf4d;"></div>Custos Variáveis e Gateways (20%)</li>
-                    <li><div class="color-box" style="background: #1a1a1a;"></div>Impostos e Split-Fee (15%)</li>
+                    <li><div class="color-box" style="background: var(--accent-color);"></div> Margem de Contribuição (65%)</li>
+                    <li><div class="color-box" style="background: #86b32d;"></div> Custos Variáveis / Gateway (20%)</li>
+                    <li><div class="color-box" style="background: #333;"></div> Impostos e Taxas (15%)</li>
                 </ul>
             </div>
             <div style="text-align: center;">
-                <div class="formula-text">
-                    Break-Even Point = Custos Fixos Totais / Margem de Contribuição Unitária
+                <div class="formula-container">
+                    Break-Even Point = Custos Fixos / Margem Contrib. Unitária
                 </div>
             </div>
         </div>
-        <div></div>
-    </div>
+        <div class="footer-equipe">Equipe: Rafael Romero, Bryan Lucas, Daniel Abner e Felipe Braga</div>
+    </section>
 
-    <!-- SLIDE 10: EXECUÇÃO -->
-    <div class="slide-container" id="slide10">
+    <section class="slide-container" id="slide8">
+        <h2 class="slide-title">Estrutura de <span>Custos (Alocação)</span></h2>
+        <div class="content-area">
+            <div class="chart-container">
+                <div class="bar">
+                    <div class="label">P&D e Engenharia</div>
+                    <div class="bar-inner"><div class="bar-fill" style="width: 45%;">45% - Desenvolvimento Core</div></div>
+                </div>
+                <div class="bar">
+                    <div class="label">Marketing e CAC</div>
+                    <div class="bar-inner"><div class="bar-fill" style="width: 30%;">30% - Aquisição B2B/B2C</div></div>
+                </div>
+                <div class="bar">
+                    <div class="label">Operações e Suporte</div>
+                    <div class="bar-inner"><div class="bar-fill" style="width: 15%;">15% - Sucesso do Cliente</div></div>
+                </div>
+                <div class="bar">
+                    <div class="label">Administrativo</div>
+                    <div class="bar-inner"><div class="bar-fill" style="width: 10%;">10% - Legal e Backoffice</div></div>
+                </div>
+            </div>
+            <p style="margin-top: 1.5rem; text-align: center; width: 100%;">Foco inicial em <strong>Engenharia de Produto</strong> para garantir retenção e estabilidade.</p>
+        </div>
+        <div class="footer-equipe">Equipe: Rafael Romero, Bryan Lucas, Daniel Abner e Felipe Braga</div>
+    </section>
+
+    <section class="slide-container" id="slide9">
         <h2 class="slide-title">Roadmap de <span>Execução</span></h2>
         <div class="content-area">
             <div class="timeline-layout">
                 <div class="timeline-line"></div>
                 <div class="timeline-item">
-                    <h3>Mês 01-03: MVP</h3>
-                    <p>Deploy da infraestrutura Core e validação do ERP SaaS com 10 lojas Alfa.</p>
+                    <h3>Meses 1-3</h3>
+                    <p>MVP: Validação do ERP com 10 lojas beta selecionadas.</p>
                 </div>
                 <div class="timeline-item">
-                    <h3>Mês 04-06: Go-to-Market</h3>
-                    <p>Lançamento do aplicativo B2C nas lojas digitais e início do Split de Pagamento.</p>
+                    <h3>Meses 4-6</h3>
+                    <p>Marketplace: Lançamento do App B2C e Split de Pagamentos.</p>
                 </div>
                 <div class="timeline-item">
-                    <h3>Mês 07-12: Escala</h3>
-                    <p>Aceleração via Inside Sales regional e agressividade em Ads geolocalizado.</p>
+                    <h3>Meses 7-12</h3>
+                    <p>Expansão: Inside Sales regional e Marketing geolocalizado forte.</p>
                 </div>
                 <div class="timeline-item">
-                    <h3>Ano 2+: Ecossistema</h3>
-                    <p>Abertura do braço FinTech com antecipação de recebíveis e Marketplace de insumos B2B.</p>
+                    <h3>Ano 2+</h3>
+                    <p>Escala: Início do braço Fintech (Antecipação) e IA de dados.</p>
                 </div>
             </div>
         </div>
-        <div></div>
-    </div>
+        <div class="footer-equipe">Equipe: Rafael Romero, Bryan Lucas, Daniel Abner e Felipe Braga</div>
+    </section>
 
-    <!-- SLIDE 11: CLOSING -->
-    <div class="slide-container" id="slide11">
-        <div></div>
-        <div class="qa-layout">
-            <h2>Obrigado.</h2>
-            <p class="subtitle" style="color: #ffffff; font-size: 2rem;">Abrimos espaço para perguntas e alinhamento de tese.</p>
-            <div class="contact-info">
-                <strong>Lava-Jato Digital</strong> | board@lavajatodigital.com.br | lavajatodigital.com.br
+    <section class="slide-container" id="slide10">
+        <div class="content-area title-layout">
+            <h2 style="font-size: clamp(3rem, 7vw, 4.5rem); color: var(--accent-color); margin-bottom: 20px;">Obrigado!</h2>
+            <p style="font-size: clamp(1.1rem, 2.5vw, 1.4rem); margin-bottom: 40px;">Dúvidas, perguntas ou considerações?</p>
+            <div style="font-family: 'Azeret Mono', monospace; border: 1px solid var(--border-color); padding: 15px 25px; border-radius: 8px; display: inline-block; word-wrap: break-word; max-width: 100%;">
+                www.lavajatodigital.com.br
             </div>
         </div>
-        <div></div>
-    </div>
+        <div class="footer-equipe">Equipe: Rafael Romero, Bryan Lucas, Daniel Abner e Felipe Braga</div>
+    </section>
 
-    <script>
-        const slides = document.querySelectorAll('.slide-container');
-        let currentSlide = 0;
-
-        function showSlide(index) {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (index + slides.length) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }
-
-        document.getElementById('nextBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            showSlide(currentSlide + 1);
-        });
-
-        document.getElementById('prevBtn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            showSlide(currentSlide - 1);
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'ArrowRight' || e.key === ' ') {
-                showSlide(currentSlide + 1);
-            } else if (e.key === 'ArrowLeft') {
-                showSlide(currentSlide - 1);
-            }
-        });
-    </script>
+</div>
 
 </body>
 </html>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Negócios - Lava-Jato Digital</title>
+    
+    <style>
+        /* RESET & CONFIGURAÇÕES GERAIS */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: #030303;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* SISTEMA DE APRESENTAÇÃO */
+        .slide-container {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            background-color: #050505;
+            position: relative;
+            overflow: hidden;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 60px 100px;
+            user-select: none;
+        }
+
+        .slide-container.active {
+            display: flex;
+        }
+
+        /* GLOW BACKGROUND EFFECT GRADIENT */
+        .slide-container::before {
+            content: '';
+            position: absolute;
+            top: -150px;
+            right: -150px;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(222, 255, 154, 0.12) 0%, rgba(141, 181, 49, 0.02) 50%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .slide-container::after {
+            content: '';
+            position: absolute;
+            bottom: 40px;
+            left: 100px;
+            right: 100px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(222, 255, 154, 0.3), transparent);
+        }
+
+        .slide-container > * { position: relative; z-index: 10; }
+
+        /* NAVEGAÇÃO VELADA (ZONAS DE CLIQUE) */
+        .nav-zone {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 10%;
+            z-index: 100;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .nav-left { left: 0; }
+        .nav-right { right: 0; }
+        .nav-zone:hover { background: linear-gradient(to right, rgba(222, 255, 154, 0.02), transparent); }
+        .nav-right:hover { background: linear-gradient(to left, rgba(222, 255, 154, 0.02), transparent); }
+
+        /* TIPOGRAFIA EXECUTIVA */
+        h1 { font-size: 5rem; line-height: 1.1; font-weight: 800; text-align: center; letter-spacing: -1.5px; }
+        h1 span { 
+            background: linear-gradient(135deg, #deff9a 0%, #a6df3e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .slide-title { 
+            font-size: 2.6rem; 
+            font-weight: 800; 
+            margin-bottom: 25px; 
+            border-left: 6px solid #deff9a; 
+            padding-left: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .slide-title span { 
+            background: linear-gradient(135deg, #deff9a 0%, #a6df3e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        p, li { font-size: 1.4rem; color: #adadad; line-height: 1.6; margin-bottom: 12px; }
+        strong { color: #ffffff; font-weight: 600; }
+        
+        .subtitle { font-size: 1.8rem; color: #888; text-align: center; max-width: 950px; margin: 30px auto 0; line-height: 1.5; }
+
+        .content-area { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; }
+
+        /* LAYOUTS */
+        .title-layout { text-align: center; margin: auto; max-width: 1100px; }
+        
+        .section-title-layout { text-align: center; margin: auto; }
+        .section-title-layout hr { border: none; height: 4px; background: linear-gradient(90deg, transparent, #deff9a, transparent); width: 200px; margin: 25px auto; }
+        .section-title-layout h2 { font-size: 4.8rem; font-weight: 800; color: #ffffff; letter-spacing: -1.5px; }
+
+        .two-column { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 60px; align-items: center; width: 100%; }
+        .two-column h3 { font-size: 2rem; color: #deff9a; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .image-wrapper { 
+            width: 100%; 
+            height: 420px; 
+            border-radius: 16px; 
+            overflow: hidden;
+            border: 1px solid #222; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .image-wrapper img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(10%) brightness(85%); }
+
+        .tiled-content { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; width: 100%; }
+        .tile { background: #0d0d0d; padding: 40px 30px; border-radius: 16px; text-align: left; border: 1px solid #1a1a1a; transition: all 0.3s ease; }
+        .tile:hover { border-color: #deff9a; transform: translateY(-5px); }
+        .tile .tile-icon { font-size: 2.5rem; margin-bottom: 20px; color: #deff9a; display: block; }
+        .tile h3 { font-size: 1.6rem; margin-bottom: 15px; color: #ffffff; font-weight: 700; }
+        .tile p { font-size: 1.1rem; color: #888; margin-bottom: 0; }
+
+        .bullet-list { list-style: none; }
+        .bullet-list li { position: relative; padding-left: 35px; margin-bottom: 20px; font-size: 1.35rem; }
+        .bullet-list li::before { content: '→'; position: absolute; left: 0; color: #deff9a; font-size: 1.4rem; font-weight: bold; top: -1px; }
+
+        /* TABELAS EXECUTIVAS */
+        table { width: 100%; border-collapse: collapse; background: #0d0d0d; border-radius: 12px; overflow: hidden; border: 1px solid #1a1a1a; }
+        th { background: #111; color: #deff9a; padding: 20px; text-align: left; font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #222; }
+        td { padding: 20px; border-bottom: 1px solid #1a1a1a; font-size: 1.2rem; color: #adadad; }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background: rgba(255, 255, 255, 0.01); }
+
+        /* REESTRUTURAÇÃO DO GRÁFICO DE CUSTOS COM ALTA VISIBILIDADE E GRADIENTE CHIC */
+        .chart-container { width: 100%; display: flex; flex-direction: column; gap: 24px; }
+        .bar { display: flex; align-items: center; width: 100%; }
+        .bar .label { 
+            width: 280px; 
+            text-align: right; 
+            padding-right: 25px; 
+            font-weight: 700; 
+            font-size: 1.35rem; 
+            color: #ffffff; 
+            flex-shrink: 0;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .bar .bar-inner { 
+            flex-grow: 1; 
+            height: 50px; 
+            background: #090909; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            border: 1px solid #262626;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .bar .bar-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #b3ea3a 0%, #deff9a 50%, #ffffff 100%); 
+            display: flex; 
+            align-items: center; 
+            padding-left: 24px; 
+            color: #000000; 
+            font-weight: 800; 
+            font-size: 1.2rem; 
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+            box-shadow: 3px 0 10px rgba(222, 255, 154, 0.4);
+            text-shadow: 0 0 1px rgba(255,255,255,0.5);
+        }
+
+        /* PIZZA / DOUGHNUT */
+        .doughnut-chart-container { display: flex; align-items: center; justify-content: center; gap: 80px; }
+        .doughnut-chart { width: 280px; height: 280px; border-radius: 50%; border: 10px solid #0d0d0d; }
+        .legend { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+        .legend li { display: flex; align-items: center; gap: 15px; font-size: 1.3rem; color: #ffffff; margin-bottom: 0; }
+        .color-box { width: 20px; height: 20px; border-radius: 4px; flex-shrink: 0; }
+
+        /* ROADMAP CRONOLÓGICO */
+        .timeline-layout { display: flex; justify-content: space-between; position: relative; padding: 60px 0; align-items: flex-start; }
+        .timeline-line { position: absolute; top: 95px; left: 0; width: 100%; height: 2px; background: #222; z-index: 1; }
+        .timeline-item { width: 22%; position: relative; text-align: center; z-index: 5; }
+        .timeline-item::after { content: ''; position: absolute; top: 35px; left: 50%; transform: translate(-50%, -50%); width: 16px; height: 16px; background: #deff9a; border-radius: 50%; border: 4px solid #050505; box-shadow: 0 0 15px rgba(222, 255, 154, 0.6); }
+        .timeline-item h3 { color: #deff9a; margin-bottom: 60px; font-size: 1.4rem; font-weight: 700; text-transform: uppercase; }
+        .timeline-item p { font-size: 1.1rem; color: #888; padding: 0 10px; }
+
+        /* ENCERRAMENTO */
+        .qa-layout { text-align: center; margin: auto; }
+        .qa-layout h2 { font-size: 5.5rem; color: #deff9a; margin-bottom: 20px; letter-spacing: -1px; }
+        .contact-info { margin-top: 40px; font-size: 1.4rem; border-top: 1px solid #1a1a1a; padding-top: 30px; display: inline-block; color: #888; }
+        .contact-info strong { color: #deff9a; }
+        
+        .formula-text { font-size: 1.4rem; color: #deff9a; font-family: 'Courier New', monospace; background: #0d0d0d; padding: 15px 30px; border-radius: 6px; border: 1px dashed #222; display: inline-block; margin-top: 25px; }
+
+        .controls-hint { position: absolute; bottom: 20px; right: 40px; font-size: 11px; color: #555; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+
+    <!-- Zonas de Navegação Invisíveis nas Laterais -->
+    <div class="nav-zone nav-left" id="prevBtn"></div>
+    <div class="nav-zone nav-right" id="nextBtn"></div>
+
+    <!-- SLIDE 1: CAPA -->
+    <div class="slide-container active" id="slide1">
+        <div></div>
+        <div class="title-layout">
+            <h1>Sistema de <span>Lava-Jato</span> Digital</h1>
+            <p class="subtitle">Business Model Canvas e Viabilidade Financeira para Plataforma Multilateral de Alta Escala.</p>
+        </div>
+        <div class="controls-hint">Laterais da tela ou setas do teclado</div>
+    </div>
+
+    <!-- SLIDE 2: TRANSIÇÃO DE CONTEXTO -->
+    <div class="slide-container" id="slide2">
+        <div></div>
+        <div class="section-title-layout">
+            <h2>Contexto & Oportunidade</h2>
+            <hr>
+            <p>A disrupção digital de um mercado altamente fragmentado e sub-digitalizado.</p>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- SLIDE 3: DIAGNÓSTICO -->
+    <div class="slide-container" id="slide3">
+        <h2 class="slide-title">Gaps do <span>Mercado Atual</span></h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div>
+                    <ul class="bullet-list">
+                        <li><strong>Ociosidade vs. Picos:</strong> A ausência de agendamento preditivo gera gargalos operacionais crônicos.</li>
+                        <li><strong>Invisibilidade Digital:</strong> Estabelecimentos tradicionais perdem share por falta de canais de descoberta online.</li>
+                        <li><strong>Vazamento de Receita:</strong> Gestão de caixa analógica impede a retenção e o entendimento do LTV do cliente.</li>
+                        <li><strong>Atrito na Jornada:</strong> O consumidor moderno exige conveniência, tracking em tempo real e checkout sem fricção.</li>
+                    </ul>
+                </div>
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1607860108855-64acf2078ed9?auto=format&fit=crop&w=800&q=80" alt="Premium Car Wash Operational">
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- SLIDE 4: TRANSIÇÃO CANVAS -->
+    <div class="slide-container" id="slide4">
+        <div></div>
+        <div class="section-title-layout">
+            <h2>Business Model Canvas</h2>
+            <hr>
+            <p>A arquitetura de valor desenhada para monetizar as duas pontas do ecossistema.</p>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- SLIDE 5: VALUE PROP -->
+    <div class="slide-container" id="slide5">
+        <h2 class="slide-title">Segmentos & <span>Proposta de Valor</span></h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div>
+                    <h3>Proposta Multilateral</h3>
+                    <p style="margin-bottom: 20px;"><strong>Value Prop B2B (Lava-Jatos):</strong> SaaS de ERP dedicado, otimização de insumos, inteligência de escala e canal direto de aquisição através do marketplace nativo.</p>
+                    <p style="margin-bottom: 25px;"><strong>Value Prop B2C (Motoristas):</strong> Agendamento geolocalizado em 3 cliques, transparência de pricing, motor de avaliação e carteira digital com cashback dinâmico.</p>
+                    <h3>ICP Foco</h3>
+                    <p>Centros de estética automotiva de médio a grande porte (SaaS) e motoristas urbanos de alta renda (App).</p>
+                </div>
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=800&q=80" alt="Mobile Technology Integration">
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- SLIDE 6: ARQUITETURA DA OPERAÇÃO -->
+    <div class="slide-container" id="slide6">
+        <h2 class="slide-title">Operação & <span>Engrenagens</span> Chave</h2>
+        <div class="content-area">
+            <div class="tiled-content">
+                <div class="tile">
+                    <span class="tile-icon">⚙️</span>
+                    <h3>Atividades-Chave</h3>
+                    <p>Engenharia de software ágil, manutenção de infraestrutura cloud resiliente, UI/UX focada em conversão e suporte técnico enterprise.</p>
+                </div>
+                <div class="tile">
+                    <span class="tile-icon">📈</span>
+                    <h3>Canais de Tração</h3>
+                    <p>Estratégia de Growth marketing geolocalizado, inbound focado em parceiros B2B e parcerias estruturais com frotistas e seguradoras.</p>
+                </div>
+                <div class="tile">
+                    <span class="tile-icon">🔐</span>
+                    <h3>Parcerias Estratégicas</h3>
+                    <p>Gateways de pagamento (Core Banking split-payment), grandes distribuidores de insumos químicos e APIs de geolocalização.</p>
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- SLIDE 7: GO-TO-MARKET MONETIZAÇÃO -->
+    <div class="slide-container" id="slide7">
+        <h2 class="slide-title">Estrutura de <span>Receitas</span></h2>
+        <div class="content-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Modelo de Negócio</th>
+                        <th>Mecanismo de Captura</th>
+                        <th>Segmento Alvo</th>
+                        <th>Dinâmica Volumétrica</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>SaaS (Recorrência)</strong></td>
+                        <td>Mensalidade fixa pelo uso do ERP avançado de gestão interna.</td>
+                        <td>Estabelecimentos</td>
+                        <td>Garante previsibilidade e MRR base.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Take Rate (Transacional)</strong></td>
+                        <td>Comissão de 8% retida no split-payment de cada agendamento via App.</td>
+                        <td>Usuários Finais</td>
+                        <td>Escalabilidade geométrica do ecossistema.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Retail Media (Ads)</strong></td>
+                        <td>Taxa de posicionamento patrocinado no topo das buscas do Marketplace.</td>
+                        <td>Parceiros Premium</td>
+                        <td>Alta margem líquida direto para a última linha.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- SLIDE 8: ALLOCATION OF CAPITAL (CORRIGIDO E APERFEIÇOADO) -->
+    <div class="slide-container" id="slide8">
+        <h2 class="slide-title">Estrutura de <span>Custos (CapEx/OpEx)</span></h2>
+        <div class="content-area" style="justify-content: center; display: flex; align-items: center;">
+            <div class="chart-container" style="width: 100%; max-width: 1100px;">
+                
+                <!-- Barra 1 -->
+                <div class="bar">
+                    <div class="label">P&D e Engenharia</div>
+                    <div class="bar-inner">
+                        <div class="bar-fill" style="width: 45%;">45% — Core Dev, Infra Cloud e APIs</div>
+                    </div>
+                </div>
+
+                <!-- Barra 2 -->
+                <div class="bar">
+                    <div class="label">Marketing e CAC</div>
+                    <div class="bar-inner">
+                        <div class="bar-fill" style="width: 30%;">30% — Atração B2B e App B2C</div>
+                    </div>
+                </div>
+
+                <!-- Barra 3 -->
+                <div class="bar">
+                    <div class="label">Operações e CS</div>
+                    <div class="bar-inner">
+                        <div class="bar-fill" style="width: 15%;">15% — Onboarding e Suporte</div>
+                    </div>
+                </div>
+
+                <!-- Barra 4 -->
+                <div class="bar">
+                    <div class="label">Admin, Legal e Ops</div>
+                    <div class="bar-inner">
+                        <div class="bar-fill" style="width: 10%;">10% — Compliance e Backoffice</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- SLIDE 9: UNIT ECONOMICS -->
+    <div class="slide-container" id="slide9">
+        <h2 class="slide-title">Unit Economics & <span>Eficiência</span></h2>
+        <div class="content-area">
+            <div class="doughnut-chart-container">
+                <div class="doughnut-chart" style="background: conic-gradient(#deff9a 0% 65%, #a3cf4d 65% 85%, #1a1a1a 85% 100%);"></div>
+                <ul class="legend">
+                    <li><div class="color-box" style="background: #deff9a;"></div>Margem de Contribuição Alvo (65%)</li>
+                    <li><div class="color-box" style="background: #a3cf4d;"></div>Custos Variáveis e Gateways (20%)</li>
+                    <li><div class="color-box" style="background: #1a1a1a;"></div>Impostos e Split-Fee (15%)</li>
+                </ul>
+            </div>
+            <div style="text-align: center;">
+                <div class="formula-text">
+                    Break-Even Point = Custos Fixos Totais / Margem de Contribuição Unitária
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- SLIDE 10: EXECUÇÃO -->
+    <div class="slide-container" id="slide10">
+        <h2 class="slide-title">Roadmap de <span>Execução</span></h2>
+        <div class="content-area">
+            <div class="timeline-layout">
+                <div class="timeline-line"></div>
+                <div class="timeline-item">
+                    <h3>Mês 01-03: MVP</h3>
+                    <p>Deploy da infraestrutura Core e validação do ERP SaaS com 10 lojas Alfa.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Mês 04-06: Go-to-Market</h3>
+                    <p>Lançamento do aplicativo B2C nas lojas digitais e início do Split de Pagamento.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Mês 07-12: Escala</h3>
+                    <p>Aceleração via Inside Sales regional e agressividade em Ads geolocalizado.</p>
+                </div>
+                <div class="timeline-item">
+                    <h3>Ano 2+: Ecossistema</h3>
+                    <p>Abertura do braço FinTech com antecipação de recebíveis e Marketplace de insumos B2B.</p>
+                </div>
+            </div>
+        </div>
+        <div></div>
+    </div>
+
+    <!-- SLIDE 11: CLOSING -->
+    <div class="slide-container" id="slide11">
+        <div></div>
+        <div class="qa-layout">
+            <h2>Obrigado.</h2>
+            <p class="subtitle" style="color: #ffffff; font-size: 2rem;">Abrimos espaço para perguntas e alinhamento de tese.</p>
+            <div class="contact-info">
+                <strong>Lava-Jato Digital</strong> | board@lavajatodigital.com.br | lavajatodigital.com.br
+            </div>
+        </div>
+        <div></div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide-container');
+        let currentSlide = 0;
+
+        function showSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (index + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            showSlide(currentSlide + 1);
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            showSlide(currentSlide - 1);
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                showSlide(currentSlide + 1);
+            } else if (e.key === 'ArrowLeft') {
+                showSlide(currentSlide - 1);
+            }
+        });
+    </script>
+
+</body>
+</html>
